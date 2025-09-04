@@ -1,19 +1,26 @@
+import express from 'express';
+const router = express.Router();
 
-// временные данные (позже заменим на БД)
+// временные данные
 let orders = [
   { id: 1, name: "Иван Иванов", description: "Памятник, гравировка" },
   { id: 2, name: "Петр Петров", description: "Установка ограды" },
 ];
 
-// GET /api/orders
+// GET /api/orders/:id
 export const getOrderById = (req, res) => {
-  consts = {id} = req.params;
+  const { id } = req.params;
   const order = orders.find((o) => o.id.toString() === id);
 
   if (!order) {
-    return res.status(404).json({message: "Заказ не найден"});
+    return res.status(404).json({ message: "Заказ не найден" });
   }
   res.json(order);
+};
+
+// GET /api/orders
+export const getOrders = (req, res) => {
+  res.json(orders);
 };
 
 // POST /api/orders
@@ -34,32 +41,4 @@ export const createOrder = (req, res) => {
   res.status(201).json(newOrder);
 };
 
-// POST /api/orders/upload
-export const uploadFile = (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ message: "Файл не загружен" });
-  }
-
-  res.json({
-    message: "Файл успешно загружен",
-    fileUrl: `/uploads/${req.file.filename}`,
-  });
-};
-const express = require('express');
-const router = express.Router();
-const Order = require('../models/orders'); // Проверьте путь к модели
-
-// GET /api/orders/:id - получить заказ по ID
-router.get('/:id', async (req, res) => {
-  try {
-    const order = await Order.findById(req.params.id);
-    if (!order) {
-      return res.status(404).json({ error: 'Order not found' });
-    }
-    res.json(order);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-module.exports = router;
+export default router;

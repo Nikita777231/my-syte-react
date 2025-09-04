@@ -6,13 +6,11 @@ import {
   getOrderById
 } from "../controllers/ordersController.js";
 
-export default function (upload) {
-  const router = express.Router();
 
-  router.get("/", getOrders);
-  router.get("/:id", getOrderById);           // GET все заказы
-  router.post("/", createOrder);        // POST новый заказ
-  router.post("/upload", upload.single("file"), uploadFile); // POST загрузка файла
+const router = express.Router();
 
-  return router;
-}
+router.get("/", getOrders);
+router.get("/:id", getOrderById);
+router.post("/", createOrder);
+
+export default router;
