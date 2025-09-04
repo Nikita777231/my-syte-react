@@ -1,248 +1,144 @@
-import React, { useState, useMemo, useEffect } from "react";
+import { useState } from "react";
+import { createOrder } from "../api";
 
-export default function OrderForm({ priceConfig, onCreate }) {
-  // ===== все хуки строго сверху =====
+export default function OrderForm() {
   const [stoneType, setStoneType] = useState("");
-  const [sizeLabel, setSizeLabel] = useState("60x40x3");
+  const [sizeLabel, setSizeLabel] = useState("");
   const [customHeight, setCustomHeight] = useState("");
   const [customWidth, setCustomWidth] = useState("");
-  const [productionMethod, setProductionMethod] = useState("односторонняя полировка");
-
+  const [productionMethod, setProductionMethod] = useState("");
   const [flowerbed, setFlowerbed] = useState("none");
   const [stand, setStand] = useState(false);
-
   const [appliedCross, setAppliedCross] = useState(false);
   const [appliedPhotoFile, setAppliedPhotoFile] = useState(null);
   const [fioText, setFioText] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
-  const [flowersOrCandle, setFlowersOrCandle] = useState("none");
+  const [flowersOrCandle, setFlowersOrCandle] = useState("");
   const [epitaph, setEpitaph] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
 
-  const standardSizes = [
-    "60x40x3","80x40x3","80x40x5","80x40x8",
-    "100x50x5","100x50x8","120x60x8","НЕСТАНДАРТ"
-  ];
-  const productionOptions = [
-    "односторонняя полировка",
-    "2-х сторонняя полировка",
-    "3-х сторонняя полировка",
-    "4-х сторонняя полировка",
-    "5 стороняя полировка"
-  ];
-
-  // инициализируем stoneType при загрузке priceConfig
-  useEffect(() => {
-    if (priceConfig && priceConfig.stonePrices && !stoneType) {
-      const firstStone = Object.keys(priceConfig.stonePrices)[0];
-      if (firstStone) setStoneType(firstStone);
-    }
-  }, [priceConfig, stoneType]);
-
-  // если priceConfig ещё нет, показываем заглушку
-  if (!priceConfig || !priceConfig.stonePrices) {
-    return (
-      <section className="order-form">
-        <h2>Создать новый заказ</h2>
-        <p>Конфигурация цен недоступна</p>
-      </section>
-    );
-  }
-
-  // расчёт цены
-  const estimatedPrice = useMemo(() => {
-    try {
-      const stoneSet = priceConfig.stonePrices[stoneType] || {};
-      let price_stone = 0;
-
-      if (sizeLabel !== "НЕСТАНДАРТ") {
-        price_stone = Number(stoneSet[sizeLabel] || 0);
-      } else {
-        const h = Number(customHeight || 0);
-        const w = Number(customWidth || 0);
-        if (h > 0 && w > 0) {
-          const area = (h / 10) * (w / 10); // мм → см^2
-          price_stone = Math.round(area * (stoneSet.nonStandardPerSqCm || 0.5));
-        }
-      }
-
-      const extras = priceConfig.extras;
-      const price_stand = stand ? extras.stand : 0;
-      const price_flowerbed = extras.flowerbed[flowerbed] || 0;
-      const price_cross = appliedCross ? extras.cross : 0;
-      const price_photo = appliedPhotoFile ? extras.photo : 0;
-      const price_fio = fioText.trim()
-        ? extras.fioBase + fioText.trim().length * extras.fioPerChar
-        : 0;
-      const price_dates = dateFrom || dateTo ? extras.dates : 0;
-      const price_flowers =
-        flowersOrCandle === "flowers"
-          ? extras.flowers
-          : flowersOrCandle === "candle"
-          ? extras.candle
-          : 0;
-      const price_epitaph = epitaph.trim()
-        ? epitaph.trim().length * extras.epitaphPerChar
-        : 0;
-
-      return {
-        price_total:
-          price_stone +
-          price_stand +
-          price_flowerbed +
-          price_cross +
-          price_photo +
-          price_fio +
-          price_dates +
-          price_flowers +
-          price_epitaph
-      };
-    } catch {
-      return { price_total: 0 };
-    }
-  }, [
-    stoneType,sizeLabel,customHeight,customWidth,stand,
-    flowerbed,appliedCross,appliedPhotoFile,fioText,
-    dateFrom,dateTo,flowersOrCandle,epitaph,priceConfig
-  ]);
-
-  // отправка формы
   async function handleSubmit(e) {
     e.preventDefault();
+    setLoading(true);
+    setMessage(null);
 
-    const newOrder = {
-      stone_type: stoneType,
-      size_label: sizeLabel,
-      custom_height: sizeLabel === "НЕСТАНДАРТ" ? customHeight : null,
-      custom_width: sizeLabel === "НЕСТАНДАРТ" ? customWidth : null,
-      production_method: productionMethod,
-      flowerbed,
-      stand,
-      applied_cross: appliedCross,
-      applied_photo: appliedPhotoFile ? appliedPhotoFile.name : null,
-      fio: fioText,
-      date_from: dateFrom,
-      date_to: dateTo,
-      flowers_or_candle: flowersOrCandle,
-      epitaph,
-      price_total: estimatedPrice.price_total
-    };
+    const fd = new FormData();
+    fd.append("stone_type", stoneType);
+    fd.append("size_label", sizeLabel);
+    if (sizeLabel === "НЕСТАНДАРТ") {
+      fd.append("custom_height", String(customHeight || ""));
+      fd.append("custom_width", String(customWidth || ""));
+    }
+    fd.append("production_method", productionMethod);
+    fd.append("equipment_flowerbed", flowerbed);
+    fd.append("equipment_stand", String(stand));
+    fd.append("applied_cross", String(appliedCross));
+    if (appliedPhotoFile) fd.append("photo", appliedPhotoFile);
+    fd.append("fio_text", fioText);
+    fd.append("date_from", dateFrom);
+    fd.append("date_to", dateTo);
+    fd.append("applied_flowers", flowersOrCandle);
+    fd.append("epitaph", epitaph);
 
-    try{
-      const res = await fetch("/api/orders", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(newOrder)
-      });
-      const saved = await res.json();
-
-      setMessage(`Заказ сохранен в БД (ID: ${saved.id})`);
-    } catch (err){
-      setMessage("Ошибка при сохранении заказа");
-      console.error(err);
+    try {
+      const res = await createOrder(fd);
+      setMessage(`Заказ сохранён (ID: ${res.id})`);
+    } catch (err) {
+      setMessage(`Ошибка: ${err.message}`);
+    } finally {
+      setLoading(false);
     }
   }
-  // форма
+
   return (
-    <section className="order-form">
-      <h2>Создать новый заказ</h2>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Вид камня:
-          <select value={stoneType} onChange={e => setStoneType(e.target.value)}>
-            {Object.keys(priceConfig.stonePrices).map(k => (
-              <option key={k} value={k}>{k}</option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Размер:
-          <select value={sizeLabel} onChange={e => setSizeLabel(e.target.value)}>
-            {standardSizes.map(sz => <option key={sz} value={sz}>{sz}</option>)}
-          </select>
-        </label>
-        {sizeLabel === "НЕСТАНДАРТ" && (
-          <div>
-            <label>Высота (мм):
-              <input type="number" value={customHeight} onChange={e => setCustomHeight(e.target.value)} />
-            </label>
-            <label>Ширина (мм):
-              <input type="number" value={customWidth} onChange={e => setCustomWidth(e.target.value)} />
-            </label>
-          </div>
-        )}
-        <label>
-          Способ производства:
-          <select value={productionMethod} onChange={e => setProductionMethod(e.target.value)}>
-            {productionOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-          </select>
-        </label>
+    <form onSubmit={handleSubmit}>
+      <h2>Создать заказ</h2>
 
-        <fieldset>
-          <legend>Комплектация</legend>
-          <label>
-            Цветник/гробничка:
-            <select value={flowerbed} onChange={e => setFlowerbed(e.target.value)}>
-              <option value="none">нет</option>
-              <option value="small">маленькая</option>
-              <option value="medium">средняя</option>
-              <option value="large">большая</option>
-            </select>
-          </label>
-          <label>
-            Подставка:
-            <input type="checkbox" checked={stand} onChange={() => setStand(!stand)} />
-          </label>
-        </fieldset>
+      <label>
+        Тип камня:
+        <input value={stoneType} onChange={(e) => setStoneType(e.target.value)} />
+      </label>
 
-        <fieldset>
-          <legend>Нанесение</legend>
-          <label>
-            Крестик:
-            <input type="checkbox" checked={appliedCross} onChange={() => setAppliedCross(!appliedCross)}  />
-          </label>
-          <label>
-            Фотография:
-            <input type="file" accept="image/*" onChange={e => setAppliedPhotoFile(e.target.files[0] || null)} />
-            {appliedPhotoFile && (
-              <img src={URL.createObjectURL(appliedPhotoFile)} alt="Предпросмотр" style={{maxWidth: 120, marginTop:8, borderRadius: 4}}/>
-            )}
-          </label>
-          <label>
-            ФИО:
-            <input  type="text" value={fioText} onChange={e => setFioText(e.target.value)} />
-          </label>
-          <label>
-            Дата рождения:
-            <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} />
-          </label>
-          <label>
-            Дата смерти:
-            <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} />
-          </label>
-          <label>
-            Цветы/свеча:
-            <select value={flowersOrCandle} onChange={e => setFlowersOrCandle(e.target.value)}>
-              <option value="none">нет</option>
-              <option value="flowers">цветы</option>
-              <option value="candle">свеча</option>
-            </select>
-          </label>
-          <label>
-            Эпитафия:
-            <textarea value={epitaph} onChange={e => setEpitaph(e.target.value)} />
-          </label>
-        </fieldset>
+      <label>
+        Размер:
+        <input value={sizeLabel} onChange={(e) => setSizeLabel(e.target.value)} />
+      </label>
 
-        <h3>Итог: {estimatedPrice.price_total} ₽</h3>
-        <button type="submit" disabled={loading}>
-          {loading ? "Создаём..." : "Создать заказ"}
-        </button>
-        {message && <div className="message">{message}</div>}
-      </form>
-    </section>
+      {sizeLabel === "НЕСТАНДАРТ" && (
+        <>
+          <label>
+            Высота:
+            <input type="number" value={customHeight} onChange={(e) => setCustomHeight(e.target.value)} />
+          </label>
+          <label>
+            Ширина:
+            <input type="number" value={customWidth} onChange={(e) => setCustomWidth(e.target.value)} />
+          </label>
+        </>
+      )}
+
+      <label>
+        Метод изготовления:
+        <input value={productionMethod} onChange={(e) => setProductionMethod(e.target.value)} />
+      </label>
+
+      <label>
+        Цветник:
+        <select value={flowerbed} onChange={(e) => setFlowerbed(e.target.value)}>
+          <option value="none">Без цветника</option>
+          <option value="small">Малый</option>
+          <option value="large">Большой</option>
+        </select>
+      </label>
+
+      <label>
+        Подставка:
+        <input type="checkbox" checked={stand} onChange={(e) => setStand(e.target.checked)} />
+      </label>
+
+      <label>
+        Крест:
+        <input type="checkbox" checked={appliedCross} onChange={(e) => setAppliedCross(e.target.checked)} />
+      </label>
+
+      <label>
+        Фото:
+        <input type="file" onChange={(e) => setAppliedPhotoFile(e.target.files[0])} />
+      </label>
+
+      <label>
+        ФИО:
+        <input value={fioText} onChange={(e) => setFioText(e.target.value)} />
+      </label>
+
+      <label>
+        Дата "с":
+        <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
+      </label>
+
+      <label>
+        Дата "по":
+        <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
+      </label>
+
+      <label>
+        Цветы/свеча:
+        <input value={flowersOrCandle} onChange={(e) => setFlowersOrCandle(e.target.value)} />
+      </label>
+
+      <label>
+        Эпитафия:
+        <input value={epitaph} onChange={(e) => setEpitaph(e.target.value)} />
+      </label>
+
+      <button type="submit" disabled={loading}>
+        {loading ? "Отправка..." : "Создать заказ"}
+      </button>
+
+      {message && <p>{message}</p>}
+    </form>
   );
 }

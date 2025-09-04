@@ -1,17 +1,12 @@
-import { Routes, Route } from 'react-router-dom';
-import Layout from './components/Layout';
-import Home from './pages/Home';
-import Create from './pages/Create';
-import Search from './pages/Search';
+import { Routes, Route } from "react-router-dom";
+import OrderForm from "./components/OrderForm";
+import OrderList from "./components/OrderList";
 
 export default function App() {
   return (
     <Routes>
-      <Route element={<Layout />}>
-        <Route index element={<Home />} />
-        <Route path="create" element={<Create />} />
-        <Route path="search" element={<Search />} />
-      </Route>
+      <Route path="/" element={<OrderForm />} />
+      <Route path="/orders" element={<OrderList orders={[]} />} />
     </Routes>
   );
 }

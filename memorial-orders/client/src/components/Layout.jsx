@@ -5,6 +5,7 @@ export default function Layout() {
     return (
         <>
         <nav className="dock-bar">
+            <NavLink to="/">Главная</NavLink>
             <NavLink to="/create">Создать</NavLink>
             <NavLink to="/search">Найти / Изменить</NavLink>
         </nav>
