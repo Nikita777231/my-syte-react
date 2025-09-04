@@ -1,43 +1,30 @@
-// инициализация конфигурации из .env
-require('dotenv').config();
+import express from "express";
+import cors from "cors";
+import multer from "multer";
+import ordersRoutes from "./routes/orders.js";
 
-// импорт библиотек
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
-
-// импорт роутера заказов
-const ordersRouter = require('./routes/orders');
-
-// создаём приложение express
 const app = express();
+const PORT = 5000;
 
-// получаем порт из env или 4000 по умолчанию
-const PORT = process.env.PORT || 4000;
+// middlewares
+app.use(cors());
+app.use(express.json());
+app.use("/uploads", express.static("uploads"));
 
-// общие middlewares
-app.use(cors());                // разрешаем CORS (для dev между client<->server)
-app.use(express.json());        // умеем парсить JSON
-app.use(express.urlencoded({ extended: true })); // парсим urlencoded (формы)
-
-// отдаём статически загруженные файлы (фото) из папки uploads
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// роуты
-app.use('/api/orders', ordersRouter);
-
-// опционально отдаём конфиг цен через API (полезно фронту)
-app.get('/api/prices', (req, res) => {
-  const { priceConfig } = require('./config/prices');
-  res.json(priceConfig);
+// multer для загрузки файлов
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
 });
+const upload = multer({ storage });
 
-// корневой маршрут — простая подсказка
-app.get('/', (req, res) => {
-  res.send('Memorial Orders API. Use /api/orders');
-});
+// маршруты
+app.use("/api/orders", ordersRoutes(upload));
 
-// запуск сервера
 app.listen(PORT, () => {
-  console.log(`Server started on port ${PORT}`);
+  console.log(`✅ Сервер запущен: http://localhost:${PORT}`);
 });

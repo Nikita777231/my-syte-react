@@ -1,21 +1,23 @@
 :root {
-  /* Colors */
-  --clr-bg: #f9fafb;
-  --clr-card: #ffffff;
-  --clr-primary: #2f80ed;
-  --clr-primary-hover: #1c66d2;
-  --clr-disabled: #9bbef9;
-  --clr-text: #111827;
-  --clr-text-muted: #6b7280;
-  --clr-border: #e5e7eb;
+  --bg-primary: #f4f4f9;
+  --bg-secondary: #ffffff;
+  --bg-input: #ffffff;
+  --text-primary: #222222;
+  --border-color: #cccccc;
 
-  /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(0,0,0,.05);
-  --shadow-md: 0 4px 6px -1px rgba(0,0,0,.1), 0 2px 4px -1px rgba(0,0,0,.06);
+  --primary: #007bff;
+  --primary-dark: #0056b3;
+  --button-text: #ffffff;
+}
 
-  /* Radius */
-  --radius: 8px;
+[data-theme="dark"] {
+  --bg-primary: #1e1e2f;
+  --bg-secondary: #2c2c3e;
+  --bg-input: #3a3a4d;
+  --text-primary: #f5f5f5;
+  --border-color: #555555;
 
-  /* Fonts */
-  --font-sans: "Inter", system-ui, sans-serif;
+  --primary: #4a90e2;
+  --primary-dark: #357abd;
+  --button-text: #ffffff;
 }

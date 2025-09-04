@@ -1,0 +1,83 @@
+.orders-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.order-form,
+.order-list {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 600px;
+  transition: background 0.3s, color 0.3s;
+}
+
+.order-form h2,
+.order-list h2 {
+  margin-bottom: 1rem;
+  text-align: center;
+  font-size: 1.5rem;
+  color: var(--text-primary);
+}
+
+.order-form input,
+.order-form textarea {
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: background 0.3s, color 0.3s, border 0.3s;
+}
+
+.order-form textarea {
+  resize: none;
+  height: 100px;
+}
+
+.order-form input[type="file"] {
+  border: none;
+  padding: 0;
+}
+
+.order-form button {
+  width: 100%;
+  padding: 0.75rem;
+  background: var(--primary);
+  color: var(--button-text, #fff);
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.order-form button:hover {
+  background: var(--primary-dark);
+}
+
+.order-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.order-list li {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.order-list li:last-child {
+  border-bottom: none;
+}

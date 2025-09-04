@@ -1,25 +1,38 @@
-import PageLayout from "./PageLayout";
+import React, { useEffect, useState } from "react";
 
-export default function OrderList({ orders }) {
-  if (!orders || orders.length === 0) {
-    return (
-      <PageLayout title="Список заказов">
-        <p>Пока заказов нет.</p>
-      </PageLayout>
-    );
-  }
+export default function OrderList() {
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/api/orders")
+      .then((res) => res.json())
+      .then((data) => {
+        setOrders(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Ошибка загрузки заказов:", err);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) return <p>Загрузка...</p>;
 
   return (
-    <PageLayout title="Список заказов">
-      <ul className="order-list">
-        {orders.map((o) => (
-          <li key={o.id} className="order-card">
-            <strong>#{o.id}</strong>
-            <p>{o.stone_type} {o.size_label}</p>
-            <p>Итого: {o.price_total} ₽</p>
-          </li>
-        ))}
-      </ul>
-    </PageLayout>
+    <div className="order-list">
+      <h2>Список заказов</h2>
+      {orders.length === 0 ? (
+        <p>Заказов пока нет</p>
+      ) : (
+        <ul>
+          {orders.map((order) => (
+            <li key={order.id}>
+              <strong>{order.name}</strong> — {order.description}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }

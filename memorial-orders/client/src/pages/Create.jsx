@@ -1,12 +1,14 @@
-import OrderForm from '../components/OrderForm';
-import { priceConfig } from '../config/price';
+import React from "react";
+import PageLayout from "../components/PageLayout";
 
 export default function Create() {
-    const handleCreate = (order) => console.log('Заказ создан', order);
-    return (
-        <>
-        <h1>Создать новый заказ</h1>
-        <OrderForm priceConfig = {priceConfig} onCleate={handleCreate}/>
-        </>
-    );
+  return (
+    <PageLayout title="Создать заказ">
+      <form className="create-form">
+        <input type="text" placeholder="Имя клиента" />
+        <input type="text" placeholder="Описание заказа" />
+        <button type="submit">Создать</button>
+      </form>
+    </PageLayout>
+  );
 }
