@@ -1,0 +1,28 @@
+.dock-bar {
+    position: fixed;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 1000;
+}
+
+.dock-bar button {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    transition: background 0.2s, trasform 0.15s;
+    white-space: nowrap;
+}
+
+.doc-bar button:hover{
+    transform: scale(1.05);
+    background: #f3f4f6;
+}

@@ -1,0 +1,132 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+@import "./variables.css";
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--clr-bg);
+  color: var(--clr-text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app-container {
+  max-width: 920px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+/* Card wrapper */
+.order-form,
+.order-list,
+.order-search {
+  background: var(--clr-card);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius);
+  padding: 24px 32px 32px;
+  margin-bottom: 32px;
+  box-shadow: var(--shadow-md);
+}
+
+h2 {
+  margin: 0 0 20px;
+  font-weight: 600;
+  color: var(--clr-text);
+}
+
+label {
+  display: block;
+  margin-bottom: 16px;
+  font-weight: 500;
+  color: var(--clr-text-muted);
+}
+
+input[type=text],
+input[type=number],
+input[type=date],
+select,
+textarea {
+  width: 100%;
+  padding: 8px 12px;
+  margin-top: 4px;
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius);
+  font-size: 1rem;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+fieldset {
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius);
+  margin: 20px 0;
+  padding: 16px 20px;
+}
+
+legend {
+  padding: 0 6px;
+  font-weight: 500;
+  color: var(--clr-text);
+}
+
+button {
+  background: var(--clr-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 10px 20px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .2s;
+}
+
+button:hover:not(:disabled) {
+  background: var(--clr-primary-hover);
+}
+
+button:disabled {
+  background: var(--clr-disabled);
+  cursor: not-allowed;
+}
+
+.message {
+  margin-top: 12px;
+  padding: 12px 16px;
+  background: #e0f2fe;
+  color: #0c4a6e;
+  border-left: 4px solid var(--clr-primary);
+  border-radius: 4px;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--clr-border);
+}
+
+li:last-child {
+  border-bottom: none;
+}
+
+.order-cards {
+  display : grid;
+  gap:16 px;
+}
+.cars {
+  background: var(--clr-card);
+  border: 1px solid var(--clr-border);
+  border-radius:var (--radius);
+  padding: 16px 20px;
+  box-shadow: var (--shadow-sm);
+}
