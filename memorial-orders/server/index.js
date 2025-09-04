@@ -23,6 +23,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // маршруты
+const orderRoutes = require('./controllers/orderController');
 app.use("/api/orders", ordersRoutes(upload));
 
 app.listen(PORT, () => {

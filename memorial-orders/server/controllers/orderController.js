@@ -1,3 +1,4 @@
+
 // временные данные (позже заменим на БД)
 let orders = [
   { id: 1, name: "Иван Иванов", description: "Памятник, гравировка" },
@@ -44,3 +45,21 @@ export const uploadFile = (req, res) => {
     fileUrl: `/uploads/${req.file.filename}`,
   });
 };
+const express = require('express');
+const router = express.Router();
+const Order = require('../models/orders'); // Проверьте путь к модели
+
+// GET /api/orders/:id - получить заказ по ID
+router.get('/:id', async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+module.exports = router;

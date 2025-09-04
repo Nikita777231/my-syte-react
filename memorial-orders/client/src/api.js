@@ -1,21 +1,51 @@
-// Простой wrapper для fetch запросов к нашему backend
+// Базовый URL для API бэкенда
+const API_BASE_URL = 'http://localhost:5000';
+
+/**
+ * Универсальная функция-обёртка для fetch запросов к API
+ * @param {string} url - URL запроса (относительный или абсолютный)
+ * @param {Object} options - Опции для fetch
+ * @returns {Promise<any>} - Результат запроса
+ */
 export async function fetchJSON(url, options = {}) {
-  const res = await fetch(url, options);
-  // если ответ не OK — пытаемся прочитать тело с ошибкой
-  if (!res.ok) {
-    let data;
-    // eslint-disable-next-line no-unused-vars
-    try { data = await res.json(); } catch (_) { data = null; }
-    const msg = data && data.error ? data.error : `HTTP error ${res.status}`;
-    throw new Error(msg);
-  }
-  // если тело есть — возвращаем parsed json
-  const text = await res.text();
+  // Формируем полный URL, если передан относительный путь
+  const fullUrl = url.startsWith('http') ? url : `${API_BASE_URL}${url}`;
+  
   try {
-    return JSON.parse(text);
-  } catch {
-    // если не JSON — вернём текст
-    return text;
+    const res = await fetch(fullUrl, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+    });
+
+    // Если ответ не OK — пытаемся прочитать тело с ошибкой
+    if (!res.ok) {
+      let errorData;
+      try {
+        errorData = await res.json();
+      } catch {
+        errorData = { error: `HTTP error ${res.status} ${res.statusText}` };
+      }
+      throw new Error(errorData.error || errorData.message || `HTTP error ${res.status}`);
+    }
+
+    // Обрабатываем успешный ответ
+    const text = await res.text();
+    if (!text) return null; // Если тело ответа пустое
+
+    try {
+      return JSON.parse(text);
+    } catch {
+      return text; // Если не JSON — вернём текст
+    }
+  } catch (error) {
+    // Обрабатываем сетевые ошибки и другие исключения
+    if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+      throw new Error('Не удалось подключиться к серверу. Проверьте, запущен ли бэкенд.');
+    }
+    throw error;
   }
 }
 
@@ -24,24 +54,43 @@ export function getPrices() {
   return fetchJSON('/api/prices');
 }
 
-// API: создать заказ (FormData возможен)
+// API: создать заказ
 export function createOrder(formData) {
+  // Для FormData не устанавливаем Content-Type, браузер сделает это сам
+  const headers = formData instanceof FormData 
+    ? {} 
+    : { 'Content-Type': 'application/json' };
+  
+  const body = formData instanceof FormData 
+    ? formData 
+    : JSON.stringify(formData);
+
   return fetchJSON('/api/orders', {
     method: 'POST',
-    body: formData
+    headers,
+    body,
   });
 }
 
 // API: получить заказ по id
-export function getOrder(id) {
+export function getOrderById(id) {
   return fetchJSON(`/api/orders/${id}`);
 }
 
-// API: обновить заказ (formData)
+// API: обновить заказ
 export function updateOrder(id, formData) {
+  const headers = formData instanceof FormData 
+    ? {} 
+    : { 'Content-Type': 'application/json' };
+  
+  const body = formData instanceof FormData 
+    ? formData 
+    : JSON.stringify(formData);
+
   return fetchJSON(`/api/orders/${id}`, {
     method: 'PUT',
-    body: formData
+    headers,
+    body,
   });
 }
 
@@ -65,4 +114,14 @@ export function confirmOrder(id, customer) {
 export function listOrders(q = '') {
   const url = q ? `/api/orders?q=${encodeURIComponent(q)}` : '/api/orders';
   return fetchJSON(url);
+}
+
+// API: получить все заказы (алиас для listOrders)
+export function getAllOrders() {
+  return listOrders();
+}
+
+// API: получить статистику
+export function getStats() {
+  return fetchJSON('/api/stats');
 }

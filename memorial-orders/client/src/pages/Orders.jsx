@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "../styles/orders.css";
+import { getOrderById } from "../api";
 
 export default function Orders() {
   const [orderId, setOrderId] = useState("");
@@ -12,12 +13,8 @@ export default function Orders() {
     setOrder(null);
 
     try {
-      const res = await fetch(`http://localhost:5000/api/orders/${orderId}`);
-      if (!res.ok) {
-        throw new Error("Заказ не найден");
-      }
-      const data = await res.json();
-      setOrder(data);
+      const data = await getOrderById(orderId);
+      setOrder(data)
     } catch (err) {
       setError(err.message);
     }
