@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { createOrder } from "../api";
+import PageLayout from "./PageLayout";
+import "./Form.css";
 
 export default function OrderForm() {
   const [stoneType, setStoneType] = useState("");
@@ -54,91 +56,91 @@ export default function OrderForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Создать заказ</h2>
+    <PageLayout title="Создать заказ">
+      <form onSubmit={handleSubmit} className="form">
+        <label>
+          Тип камня:
+          <input value={stoneType} onChange={(e) => setStoneType(e.target.value)} />
+        </label>
 
-      <label>
-        Тип камня:
-        <input value={stoneType} onChange={(e) => setStoneType(e.target.value)} />
-      </label>
+        <label>
+          Размер:
+          <input value={sizeLabel} onChange={(e) => setSizeLabel(e.target.value)} />
+        </label>
 
-      <label>
-        Размер:
-        <input value={sizeLabel} onChange={(e) => setSizeLabel(e.target.value)} />
-      </label>
+        {sizeLabel === "НЕСТАНДАРТ" && (
+          <>
+            <label>
+              Высота:
+              <input type="number" value={customHeight} onChange={(e) => setCustomHeight(e.target.value)} />
+            </label>
+            <label>
+              Ширина:
+              <input type="number" value={customWidth} onChange={(e) => setCustomWidth(e.target.value)} />
+            </label>
+          </>
+        )}
 
-      {sizeLabel === "НЕСТАНДАРТ" && (
-        <>
-          <label>
-            Высота:
-            <input type="number" value={customHeight} onChange={(e) => setCustomHeight(e.target.value)} />
-          </label>
-          <label>
-            Ширина:
-            <input type="number" value={customWidth} onChange={(e) => setCustomWidth(e.target.value)} />
-          </label>
-        </>
-      )}
+        <label>
+          Метод изготовления:
+          <input value={productionMethod} onChange={(e) => setProductionMethod(e.target.value)} />
+        </label>
 
-      <label>
-        Метод изготовления:
-        <input value={productionMethod} onChange={(e) => setProductionMethod(e.target.value)} />
-      </label>
+        <label>
+          Цветник:
+          <select value={flowerbed} onChange={(e) => setFlowerbed(e.target.value)}>
+            <option value="none">Без цветника</option>
+            <option value="small">Малый</option>
+            <option value="large">Большой</option>
+          </select>
+        </label>
 
-      <label>
-        Цветник:
-        <select value={flowerbed} onChange={(e) => setFlowerbed(e.target.value)}>
-          <option value="none">Без цветника</option>
-          <option value="small">Малый</option>
-          <option value="large">Большой</option>
-        </select>
-      </label>
+        <label>
+          Подставка:
+          <input type="checkbox" checked={stand} onChange={(e) => setStand(e.target.checked)} />
+        </label>
 
-      <label>
-        Подставка:
-        <input type="checkbox" checked={stand} onChange={(e) => setStand(e.target.checked)} />
-      </label>
+        <label>
+          Крест:
+          <input type="checkbox" checked={appliedCross} onChange={(e) => setAppliedCross(e.target.checked)} />
+        </label>
 
-      <label>
-        Крест:
-        <input type="checkbox" checked={appliedCross} onChange={(e) => setAppliedCross(e.target.checked)} />
-      </label>
+        <label>
+          Фото:
+          <input type="file" onChange={(e) => setAppliedPhotoFile(e.target.files[0])} />
+        </label>
 
-      <label>
-        Фото:
-        <input type="file" onChange={(e) => setAppliedPhotoFile(e.target.files[0])} />
-      </label>
+        <label>
+          ФИО:
+          <input value={fioText} onChange={(e) => setFioText(e.target.value)} />
+        </label>
 
-      <label>
-        ФИО:
-        <input value={fioText} onChange={(e) => setFioText(e.target.value)} />
-      </label>
+        <label>
+          Дата "с":
+          <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
+        </label>
 
-      <label>
-        Дата "с":
-        <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
-      </label>
+        <label>
+          Дата "по":
+          <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
+        </label>
 
-      <label>
-        Дата "по":
-        <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
-      </label>
+        <label>
+          Цветы/свеча:
+          <input value={flowersOrCandle} onChange={(e) => setFlowersOrCandle(e.target.value)} />
+        </label>
 
-      <label>
-        Цветы/свеча:
-        <input value={flowersOrCandle} onChange={(e) => setFlowersOrCandle(e.target.value)} />
-      </label>
+        <label>
+          Эпитафия:
+          <input value={epitaph} onChange={(e) => setEpitaph(e.target.value)} />
+        </label>
 
-      <label>
-        Эпитафия:
-        <input value={epitaph} onChange={(e) => setEpitaph(e.target.value)} />
-      </label>
+        <button type="submit" disabled={loading}>
+          {loading ? "Отправка..." : "Создать заказ"}
+        </button>
 
-      <button type="submit" disabled={loading}>
-        {loading ? "Отправка..." : "Создать заказ"}
-      </button>
-
-      {message && <p>{message}</p>}
-    </form>
+        {message && <p>{message}</p>}
+      </form>
+    </PageLayout>
   );
 }

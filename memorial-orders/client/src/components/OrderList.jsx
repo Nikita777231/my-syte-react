@@ -1,24 +1,25 @@
+import PageLayout from "./PageLayout";
+
 export default function OrderList({ orders }) {
   if (!orders || orders.length === 0) {
     return (
-      <section>
-        <h2>Список заказов</h2>
+      <PageLayout title="Список заказов">
         <p>Пока заказов нет.</p>
-      </section>
+      </PageLayout>
     );
   }
 
   return (
-    <section>
-      <h2>Список заказов</h2>
-      <ul>
+    <PageLayout title="Список заказов">
+      <ul className="order-list">
         {orders.map((o) => (
-          <li key={o.id}>
-            <strong>#{o.id}</strong> — {o.stone_type} {o.size_label}
-            <div>Итого: {o.price_total} ₽</div>
+          <li key={o.id} className="order-card">
+            <strong>#{o.id}</strong>
+            <p>{o.stone_type} {o.size_label}</p>
+            <p>Итого: {o.price_total} ₽</p>
           </li>
         ))}
       </ul>
-    </section>
+    </PageLayout>
   );
 }

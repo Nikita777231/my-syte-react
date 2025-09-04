@@ -22,7 +22,16 @@ body {
 
 /* Card wrapper */
 .order-form,
-.order-list,
+.order-list{
+  list-style: none;
+  padding: 0;
+  margin: 20px 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 480px; /* чтобы карточки не растягивались слишком */
+}
 .order-search {
   background: var(--clr-card);
   border: 1px solid var(--clr-border);
@@ -120,8 +129,11 @@ li:last-child {
 }
 
 .order-cards {
-  display : grid;
-  gap:16 px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  text-align: center;
 }
 .cars {
   background: var(--clr-card);
@@ -129,4 +141,55 @@ li:last-child {
   border-radius:var (--radius);
   padding: 16px 20px;
   box-shadow: var (--shadow-sm);
+}
+.order-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;    /* горизонтальное центрирование */
+  justify-content: center; /* вертикальное (работает, если min-height указан) */
+  min-height: calc(100vh - 120px); /* отнимаем место для докбара */
+  text-align: center;
+  padding: 20px;
+}
+/* Светлая тема (по умолчанию) */
+:root {
+  --bg-color: #f9fafb;
+  --text-color: #111827;
+  --card-bg: #ffffff;
+  --card-border: #e5e7eb;
+  --button-bg: #3b82f6;
+  --button-bg-hover: #2563eb;
+  --button-text: #ffffff;
+}
+
+/* Тёмная тема */
+:root.dark {
+  --bg-color: #111827;
+  --text-color: #f9fafb;
+  --card-bg: #1f2937;
+  --card-border: #374151;
+  --button-bg: #3b82f6;
+  --button-bg-hover: #60a5fa;
+  --button-text: #ffffff;
+}
+
+/* Общие стили, которые используют переменные */
+body {
+  background: var(--bg-color);
+  color: var(--text-color);
+  transition: background 0.3s, color 0.3s;
+}
+
+.page-content {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+}
+
+button {
+  background: var(--button-bg);
+  color: var(--button-text);
+}
+
+button:hover {
+  background: var(--button-bg-hover);
 }
