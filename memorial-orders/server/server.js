@@ -61,57 +61,52 @@ app.get('/api/orders/:id', async (req, res) => {
   }
 });
 
+
+const multer = require('multer');
+const path = require('path');
+
+// Настройка multer для загрузки файлов
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, 'photo-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  limit: {fileSize: 5 * 1024 * 1024}, // 5MB
+});
 // POST новый заказ
-app.post('/api/orders', async (req, res) => {
+app.post('/api/orders', upload.single('photo'), async (req, res) => {
   try {
-    const {
-      stone_type,
-      size_label,
-      custom_height,
-      custom_width,
-      production_method,
-      flowerbed,
-      stand,
-      applied_cross,
-      applied_photo,
-      fio,
-      date_from,
-      date_to,
-      flowers_or_candle,
-      epitaph,
-      price_total
-    } = req.body;
+    const orderData = {
+      stone_type: req.body.stone_type,
+      size_label: req.body.size_label,
+      custom_height: req.body.custom_height,
+      custom_width: req.body.custom_width,
+      production_method: req.body.production_method,
+      fio: req.body.fio,
+      epitaph: req.body.epitaph,
+      flowers_or_candle: req.body.flowers_or_candle,
+      date_from: req.body.date_from,
+      date_to: req.body.date_to,
+      flowerbed: req.body.flowerbed === 'on',
+      stand: req.body.stand === 'on',
+      applied_cross: req.body.applied_cross === 'on',
+      applied_photo: req.body.applied_photo === 'on',
+      price_total: req.body.price_total,
+      photo_filename: req.file ? req.file.filename : null
+    };
 
-    const result = await pool.query(
-      `INSERT INTO orders 
-       (stone_type, size_label, custom_height, custom_width, production_method,
-        flowerbed, stand, applied_cross, applied_photo, fio,
-        date_from, date_to, flowers_or_candle, epitaph, price_total) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) 
-       RETURNING *`,
-      [
-        stone_type,
-        size_label,
-        custom_height || null,
-        custom_width || null,
-        production_method,
-        flowerbed,
-        stand,
-        applied_cross,
-        applied_photo,
-        fio,
-        date_from || null,
-        date_to || null,
-        flowers_or_candle,
-        epitaph,
-        price_total
-      ]
-    );
-
-    res.status(201).json(result.rows[0]);
+    const newOrder = await Order.create(orderData);
+    res.status(201).json(newOrder);
+    
   } catch (error) {
-    console.error('Ошибка при создании заказа:', error);
-    res.status(500).json({ error: 'Ошибка сервера' });
+    res.status(500).json({ error: error.message });
   }
 });
 
