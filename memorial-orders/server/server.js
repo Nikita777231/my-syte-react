@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import pkg from 'pg';
 import dotenv from 'dotenv';
+import multer from 'multer';
 
 dotenv.config();
 
@@ -62,8 +63,7 @@ app.get('/api/orders/:id', async (req, res) => {
 });
 
 
-const multer = require('multer');
-const path = require('path');
+
 
 // Настройка multer для загрузки файлов
 const storage = multer.diskStorage({
